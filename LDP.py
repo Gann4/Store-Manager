@@ -17,13 +17,16 @@ class LDPManager():
         self.root.iconphoto(False, self.Assets_Icon())
 
         nb_tabs = ttk.Notebook(self.root)
-        nb_tabs.pack(expand=YES, fill=BOTH)
+        nb_tabs.pack(expand=YES, fill=BOTH, side=TOP)
 
         nb_tabs.add(self.GUI_Treeview(nb_tabs), text="Ventas")
         nb_tabs.add(self.GUI_Registering(nb_tabs), text="Registrar")
         # nb_tabs.add(self.GUI_DueDates(nb_tabs), text="Vencimientos") Future feature
         # nb_tabs.add(None, text="Calculadora") # Calcula precios automáticamente sólo introduciendo unos valores.
         nb_tabs.add(self.GUI_Info(nb_tabs), text="Información")
+
+        self.lbl_tooltip = ttk.Label(self.root, text="")
+        self.lbl_tooltip.pack(side=BOTTOM, expand=YES, pady=25)
         
         self.root.mainloop()
 
@@ -87,38 +90,35 @@ class LDPManager():
         self.tv_lf_tvInfo = ttk.LabelFrame(frame_sales, text="Información de Item")
         self.tv_lf_tvInfo.grid(row=0, column=0, sticky=NS, ipadx=10)
 
-        lbl_tooltip = ttk.Label(frame_sales, text="")
-        lbl_tooltip.grid(row=1, column=1, pady=25)
-
         lf_objNameTitle = ttk.LabelFrame(self.tv_lf_tvInfo, text="Nombre:")
         self.tv_lbl_objName = ttk.Label(lf_objNameTitle, text="00-00-00-00")
-        self.tv_lbl_objName.bind("<Enter>", lambda e: lbl_tooltip.configure(text="ID o Nombre del item seleccionado."))
-        self.tv_lbl_objName.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_lbl_objName.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="ID o Nombre del item seleccionado."))
+        self.tv_lbl_objName.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
 
         lf_objTypeTitle = ttk.LabelFrame(self.tv_lf_tvInfo, text="Tipo:")
         self.tv_lbl_objType = ttk.Label(lf_objTypeTitle, text="Nulo")
-        self.tv_lbl_objType.bind("<Enter>", lambda e: lbl_tooltip.configure(text="Descripción del item seleccionado."))
-        self.tv_lbl_objType.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_lbl_objType.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Descripción del item seleccionado."))
+        self.tv_lbl_objType.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
 
         lf_objCurrentValueTitle = ttk.LabelFrame(self.tv_lf_tvInfo, text="Valor (AR$):")
         self.tv_lbl_objCurrentValue = ttk.Label(lf_objCurrentValueTitle, text="$0")
-        self.tv_lbl_objCurrentValue.bind("<Enter>", lambda e: lbl_tooltip.configure(text="Valor actual del item seleccionado."))
-        self.tv_lbl_objCurrentValue.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_lbl_objCurrentValue.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Valor actual del item seleccionado."))
+        self.tv_lbl_objCurrentValue.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
         
 
         lf_objNewValueTitle = ttk.LabelFrame(self.tv_lf_tvInfo, text="Nuevo valor (AR$):")
         self.tv_entry_newValue = ttk.Spinbox(lf_objNewValueTitle, from_=-999999999, to=999999999)
         self.tv_entry_newValue.set(0)
-        self.tv_entry_newValue.bind("<Enter>", lambda e: lbl_tooltip.configure(text="Cambiará el valor anterior del item seleccionado por el especificado."))
-        self.tv_entry_newValue.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_entry_newValue.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Cambiará el valor anterior del item seleccionado por el especificado."))
+        self.tv_entry_newValue.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
 
         lf_tvActions = ttk.LabelFrame(self.tv_lf_tvInfo, text="Acciones disponibles")
         self.tv_btn_update = ttk.Button(lf_tvActions, text="Actualizar", command=update_treeview_record)
-        self.tv_btn_update.bind("<Enter>", lambda e: lbl_tooltip.configure(text=f"Actualizará el valor del item seleccionado al especificado."))
-        self.tv_btn_update.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_btn_update.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text=f"Actualizará el valor del item seleccionado al especificado."))
+        self.tv_btn_update.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
         self.tv_btn_delete = ttk.Button(lf_tvActions, text="Eliminar", command=self.TreeRemoveItem)
-        self.tv_btn_delete.bind("<Enter>", lambda e: lbl_tooltip.configure(text=f"Eliminará el item seleccionado."))
-        self.tv_btn_delete.bind("<Leave>", lambda e: lbl_tooltip.configure(text=""))
+        self.tv_btn_delete.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text=f"Eliminará el item seleccionado."))
+        self.tv_btn_delete.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
 
         lf_objNameTitle.pack(fill=X)
         lf_objCurrentValueTitle.pack(fill=X)
@@ -142,18 +142,20 @@ class LDPManager():
         return frame_sales
 
     def GUI_Registering(self, parent_widget):
-        frame_registering = ttk.Frame(parent_widget)
-        frame_registering.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        frame_main = ttk.Frame(parent_widget)
+        frame_main.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         # ______Date view/edit group______
-        self.lf_date = ttk.LabelFrame(frame_registering, text="Fecha")
-        #self.lf_date.grid(row=0, column=0, pady=10, padx=10, ipadx=10, ipady=10)
+        self.lf_date = ttk.LabelFrame(frame_main, text="Fecha")
         self.lf_date.pack(expand=YES, side=LEFT, fill=BOTH)
+        frame_date = ttk.Frame(self.lf_date)
+        frame_date.pack(expand=YES)
 
         # ______Registration edit group______
-        self.lf_register = ttk.LabelFrame(frame_registering, text="Registro de acciones")
-        #self.lf_register.grid(row=0, column=1, pady=10, padx=10, sticky=NS)
+        self.lf_register = ttk.LabelFrame(frame_main, text="Registro de acciones")
         self.lf_register.pack(expand=YES, side=LEFT, fill=BOTH)
+        frame_register = ttk.Frame(self.lf_register)
+        frame_register.pack(expand=YES)
 
         # ______Date time display______
         def SetDateFields2Today(ctx):
@@ -171,34 +173,48 @@ class LDPManager():
         self.var_dateYear.set(str(self.Today()[0]))
         
         # Widget creation setup
-        label_dateTime = ttk.Label(self.lf_date, textvariable=self.var_datetime)
-        lbl_dateDay = ttk.Label(self.lf_date, text="Día")
-        lbl_dateMonth = ttk.Label(self.lf_date, text="Mes")
-        lbl_dateYear = ttk.Label(self.lf_date, text="Año")
-        self.entry_dateDay = ttk.Spinbox(self.lf_date, textvariable=self.var_dateDay, from_=1, to=31, wrap=True)
-        self.entry_dateMonth = ttk.Spinbox(self.lf_date, textvariable=self.var_dateMonth, from_=1, to=12, wrap=True)
-        self.entry_dateYear = ttk.Spinbox(self.lf_date, textvariable=self.var_dateYear, to=9999)
-        self.btn_setDate2Today = ttk.Button(self.lf_date, text="Hoy", command=lambda: SetDateFields2Today(self))
+        label_dateTime = ttk.Label(frame_date, textvariable=self.var_datetime)
+        lbl_dateDay = ttk.Label(frame_date, text="Día")
+        lbl_dateMonth = ttk.Label(frame_date, text="Mes")
+        lbl_dateYear = ttk.Label(frame_date, text="Año")
+        self.entry_dateDay = ttk.Spinbox(frame_date, width=5, textvariable=self.var_dateDay, from_=1, to=31, wrap=True)
+        self.entry_dateDay.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Establece el día de fecha."))
+        self.entry_dateDay.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        self.entry_dateMonth = ttk.Spinbox(frame_date, width=5, textvariable=self.var_dateMonth, from_=1, to=12, wrap=True)
+        self.entry_dateMonth.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Establece el mes de fecha."))
+        self.entry_dateMonth.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        self.entry_dateYear = ttk.Spinbox(frame_date, width=5, textvariable=self.var_dateYear, to=9999)
+        self.entry_dateYear.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Establece el año de fecha."))
+        self.entry_dateYear.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        self.btn_setDate2Today = ttk.Button(frame_date, text="Hoy", command=lambda: SetDateFields2Today(self))
+        self.btn_setDate2Today.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Establece todos los campos a la fecha de hoy."))
+        self.btn_setDate2Today.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
         
         # Widget position setup
         label_dateTime.grid(row=0, column=1)
         lbl_dateDay.grid(row=1, column=0, padx=25)
         lbl_dateMonth.grid(row=2, column=0, padx=25)
         lbl_dateYear.grid(row=3, column=0, padx=25)
-        self.entry_dateDay.grid(row=1, column=1, padx=5)
-        self.entry_dateMonth.grid(row=2, column=1, padx=5)
-        self.entry_dateYear.grid(row=3, column=1, padx=5)
+        self.entry_dateDay.grid(row=1, column=1, pady=5)
+        self.entry_dateMonth.grid(row=2, column=1, pady=5)
+        self.entry_dateYear.grid(row=3, column=1, pady=5)
         self.btn_setDate2Today.grid(row=4, column=1)
         
         # ______Sold amount section______
         self.var_soldAmount = StringVar()
         self.var_recievedAmount = StringVar()
         self.var_quickMode = BooleanVar()
-        label_soldAmount = ttk.Label(self.lf_register, text="Valor (Compra/Venta) (AR$)")
-        label_recievedAmount = ttk.Label(self.lf_register, text="Recibido (AR$)")
-        cb_quickMode = ttk.Checkbutton(self.lf_register, text="Modo rápido", variable=self.var_quickMode, onvalue=True, offvalue=False)
-        self.entry_soldAmount = ttk.Entry(self.lf_register, textvariable=self.var_soldAmount)
-        entry_recievedAmount = ttk.Entry(self.lf_register, textvariable=self.var_recievedAmount)
+        label_soldAmount = ttk.Label(frame_register, text="Valor (Compra/Venta) (AR$)")
+        label_recievedAmount = ttk.Label(frame_register, text="Recibido (AR$)")
+        cb_quickMode = ttk.Checkbutton(frame_register, text="Modo rápido", variable=self.var_quickMode, onvalue=True, offvalue=False)
+        cb_quickMode.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Habilita el modo rápido: no pide monto recibido, ni se muestran mensajes en ventanas emergentes."))
+        cb_quickMode.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        self.entry_soldAmount = ttk.Entry(frame_register, textvariable=self.var_soldAmount)
+        self.entry_soldAmount.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Especifica el valor de venta o compra."))
+        self.entry_soldAmount.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        entry_recievedAmount = ttk.Entry(frame_register, textvariable=self.var_recievedAmount)
+        entry_recievedAmount.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Especifica el valor en billetes recibido, para saber cuanto devolver."))
+        entry_recievedAmount.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
 
         def cb_quickmode_click():
             if self.var_quickMode.get() == False:
@@ -208,23 +224,27 @@ class LDPManager():
                 label_recievedAmount.grid()
                 entry_recievedAmount.grid()
 
-        label_soldAmount.grid(row=0, column=0, padx=10)
-        label_recievedAmount.grid(row=1, column=0, padx=10)
+        label_soldAmount.grid(row=0, column=0)
+        label_recievedAmount.grid(row=1, column=0)
         cb_quickMode.grid(row=2, column=1)
-        self.entry_soldAmount.grid(row=0, column=1)
-        entry_recievedAmount.grid(row=1, column=1)
+        self.entry_soldAmount.grid(row=0, column=1, padx=10, pady=5)
+        entry_recievedAmount.grid(row=1, column=1, padx=10, pady=5)
         self.entry_soldAmount.bind("<Return>", lambda e: entry_recievedAmount.focus())
         entry_recievedAmount.bind("<Return>", lambda e: self.SaveFile())
         
         cb_quickMode.bind("<ButtonRelease 1>", lambda e: cb_quickmode_click())
 
         # Item save section
-        self.lbl_todayEarnings=ttk.Label(self.lf_register, text="Hoy: $-")
-        button_log = ttk.Button(self.lf_register, text="Registrar", command=self.SaveFile)
+        self.lbl_todayEarnings=ttk.Label(frame_register, text="Hoy: $-")
+        self.lbl_todayEarnings.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Ventas totales de hoy."))
+        self.lbl_todayEarnings.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
+        button_log = ttk.Button(frame_register, text="Registrar", command=self.SaveFile)
+        button_log.bind("<Enter>", lambda e: self.lbl_tooltip.configure(text="Registra una venta con los valores especificados."))
+        button_log.bind("<Leave>", lambda e: self.lbl_tooltip.configure(text=""))
         button_log.grid(row=3, column=1, pady=5)
-        self.lbl_todayEarnings.grid(row=3, column=0, padx=10)
+        self.lbl_todayEarnings.grid(row=3, column=0)
 
-        return frame_registering
+        return frame_main
 
     def GUI_DueDates(self, parent_widget):
         
