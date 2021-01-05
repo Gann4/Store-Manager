@@ -112,7 +112,7 @@ class DueDates():
         self.fullpath = f"{working_directory}\\{filename}"
 
 # Main file setup
-app_version = "0.1.3"
+app_version = "0.1.3a"
 data_folder = "\\appdata\\"
 wkdir = os.getcwd() + data_folder
 
