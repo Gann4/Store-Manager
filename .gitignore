@@ -1,0 +1,4 @@
+# Ignore pyinstaller content
+*.spec
+/build
+/dist
