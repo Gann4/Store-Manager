@@ -1,0 +1,1 @@
+pyinstaller --onefile --icon=appdata\icon.ico --noconsole LDP.py
