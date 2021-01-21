@@ -1,6 +1,6 @@
 from tkinter.constants import *
 from ttkthemes import ThemedTk
-from tkinter import BooleanVar, Menu, PhotoImage, StringVar, ttk
+from tkinter import BooleanVar, IntVar, Menu, PhotoImage, StringVar, ttk
 from win10toast import ToastNotifier
 import tkinter.messagebox as msgbox
 import ldp_json_tool as ldpjson
@@ -22,7 +22,7 @@ class LDPManager():
         nb_tabs.add(self.GUI_Treeview(nb_tabs), text="Ventas")
         nb_tabs.add(self.GUI_Registering(nb_tabs), text="Registrar")
         # nb_tabs.add(self.GUI_DueDates(nb_tabs), text="Vencimientos") Future feature
-        # nb_tabs.add(None, text="Calculadora") # Calcula precios automáticamente sólo introduciendo unos valores.
+        nb_tabs.add(self.GUI_Calc(nb_tabs), text="Precios") # Calcula precios automáticamente sólo introduciendo unos valores.
         nb_tabs.add(self.GUI_Info(nb_tabs), text="Información")
 
         self.lbl_tooltip = ttk.Label(self.root, text="")
@@ -245,6 +245,51 @@ class LDPManager():
         self.lbl_todayEarnings.grid(row=3, column=0)
 
         return frame_main
+
+    def GUI_Calc(self, parent_widget):
+        root_frame = ttk.Frame(parent_widget)
+        root_frame.pack(fill=BOTH, expand=YES)
+
+        frame_left = ttk.Frame(root_frame)
+        frame_left.pack(expand=YES, side=LEFT)
+
+        lbl_payment = ttk.Label(frame_left, text="Valor (Compra)")
+        lbl_payment.grid(row=0, column=0, pady=10, padx=5)
+        var_payment = IntVar()
+        entry_payment = ttk.Spinbox(frame_left, from_=0, to=999999999, textvariable=var_payment)
+        entry_payment.grid(row=0, column=1, sticky=EW)
+
+        frame_units = ttk.Frame(frame_left)
+        frame_units.grid(row=1, column=1)
+        lbl_units = ttk.Label(frame_left, text="Unidades")
+        lbl_units.grid(row=1, column=0, pady=10, padx=5)
+        var_units = IntVar()
+        entry_units = ttk.Spinbox(frame_units, width=10, from_=0, to=999999999, textvariable=var_units)
+        var_units.set(1)
+        entry_units.pack(side=LEFT, fill=X)
+        dropdown_values = ("Individual", "Pack")
+        dropdown = ttk.Combobox(frame_units, state="readonly", values=dropdown_values, width=10)
+        dropdown.set(dropdown_values[0])
+        dropdown.pack(side=LEFT, fill=X)
+
+        lbl_salePerc = ttk.Label(frame_left, text="Ganancia (%)")
+        lbl_salePerc.grid(row=2, column=0, pady=10, padx=5)
+        var_salePerc = IntVar()
+        entry_salePerc = ttk.Spinbox(frame_left, from_=-100, to=100, textvariable=var_salePerc)
+        var_salePerc.set(40)
+        entry_salePerc.grid(row=2, column=1, sticky=EW)
+
+        # ______ Split ______
+
+        frame_right = ttk.Frame(root_frame)
+        frame_right.pack(expand=YES, side=RIGHT)
+        var_finalData = StringVar()
+        var_finalData.set(var_payment.get())
+
+        lbl_finalData = ttk.Label(frame_right, textvariable=var_finalData.get())
+        lbl_finalData.pack()
+
+        return root_frame
 
     def GUI_DueDates(self, parent_widget):
         
